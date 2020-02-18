@@ -71,6 +71,8 @@ import org.osgi.service.component.ComponentInstance;
 
 import static com.google.common.base.Preconditions.checkState;
 
+import static com.google.common.base.Preconditions.checkState;
+
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Dictionary;

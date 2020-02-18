@@ -19,8 +19,11 @@ package org.opencord.igmpproxy;
 import static org.junit.Assert.assertEquals;
 import static org.onlab.junit.TestTools.assertAfter;
 
+<<<<<<< 47f2caf39f56bb671eb1c4ddaf39e25225ab34c9
 import java.util.List;
 
+=======
+>>>>>>> [SEBA-41] Operational Status IGMP Data
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,12 +32,17 @@ import org.onlab.packet.Ethernet;
 import org.onosproject.core.CoreServiceAdapter;
 import org.onosproject.net.flow.FlowRuleServiceAdapter;
 import org.onosproject.net.flowobjective.FlowObjectiveServiceAdapter;
+<<<<<<< 47f2caf39f56bb671eb1c4ddaf39e25225ab34c9
 
 import com.google.common.collect.Lists;
 
 /**
  * Set of tests of the ONOS application component for IGMP Statistics.
  */
+=======
+import org.opencord.igmpproxy.IgmpManagerBase.MockCfgService;
+
+>>>>>>> [SEBA-41] Operational Status IGMP Data
 public class IgmpStatisticsTest extends IgmpManagerBase {
 
     private static final int WAIT_TIMEOUT = 500;
@@ -62,6 +70,8 @@ public class IgmpStatisticsTest extends IgmpManagerBase {
         igmpStatisticsManager.addListener(mockListener);
         TestUtils.setField(igmpStatisticsManager, "eventDispatcher", new TestEventDispatcher());
         igmpStatisticsManager.activate(new MockComponentContext());
+        TestUtils.setField(igmpStatisticsManager, "eventDispatcher", new TestEventDispatcher());
+        igmpStatisticsManager.activate();
         igmpManager.igmpStatisticsManager = this.igmpStatisticsManager;
         // By default - we send query messages
         SingleStateMachine.sendQuery = true;
