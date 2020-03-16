@@ -18,36 +18,33 @@ package org.opencord.igmpproxy;
 
 import static org.junit.Assert.assertEquals;
 import static org.onlab.junit.TestTools.assertAfter;
-
-<<<<<<< 47f2caf39f56bb671eb1c4ddaf39e25225ab34c9
 import java.util.List;
 
-=======
->>>>>>> [SEBA-41] Operational Status IGMP Data
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.onlab.junit.TestUtils;
 import org.onlab.packet.Ethernet;
+import org.onlab.packet.Ip4Address;
 import org.onosproject.core.CoreServiceAdapter;
 import org.onosproject.net.flow.FlowRuleServiceAdapter;
 import org.onosproject.net.flowobjective.FlowObjectiveServiceAdapter;
-<<<<<<< 47f2caf39f56bb671eb1c4ddaf39e25225ab34c9
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
 
 /**
  * Set of tests of the ONOS application component for IGMP Statistics.
  */
-=======
-import org.opencord.igmpproxy.IgmpManagerBase.MockCfgService;
 
->>>>>>> [SEBA-41] Operational Status IGMP Data
 public class IgmpStatisticsTest extends IgmpManagerBase {
 
     private static final int WAIT_TIMEOUT = 500;
 
     private IgmpManager igmpManager;
+    private final Logger log = LoggerFactory.getLogger(getClass());
 
     private IgmpStatisticsManager igmpStatisticsManager;
 
@@ -70,8 +67,6 @@ public class IgmpStatisticsTest extends IgmpManagerBase {
         igmpStatisticsManager.addListener(mockListener);
         TestUtils.setField(igmpStatisticsManager, "eventDispatcher", new TestEventDispatcher());
         igmpStatisticsManager.activate(new MockComponentContext());
-        TestUtils.setField(igmpStatisticsManager, "eventDispatcher", new TestEventDispatcher());
-        igmpStatisticsManager.activate();
         igmpManager.igmpStatisticsManager = this.igmpStatisticsManager;
         // By default - we send query messages
         SingleStateMachine.sendQuery = true;
@@ -104,11 +99,15 @@ public class IgmpStatisticsTest extends IgmpManagerBase {
             savedPackets.wait(WAIT_TIMEOUT);
         }
 
+
         assertAfter(WAIT_TIMEOUT, WAIT_TIMEOUT * 2, () ->
             assertEquals((long) 2, igmpStatisticsManager.getIgmpStats().getTotalMsgReceived().longValue()));
         assertEquals((long) 1, igmpStatisticsManager.getIgmpStats().getIgmpJoinReq().longValue());
         assertEquals((long) 2, igmpStatisticsManager.getIgmpStats().getIgmpv3MembershipReport().longValue());
         assertEquals((long) 1, igmpStatisticsManager.getIgmpStats().getIgmpSuccessJoinRejoinReq().longValue());
+        assertEquals((long) 1, igmpStatisticsManager.getIgmpStats().getUnconfiguredGroupCounter().longValue());
+        assertEquals((long) 2, igmpStatisticsManager.getIgmpStats().getValidIgmpPacketCounter().longValue());
+        assertEquals((long) 1, igmpStatisticsManager.getIgmpStats().getIgmpChannelJoinCounter().longValue());
 
         assertEquals((long) 1, igmpStatisticsManager.getIgmpStats().getIgmpLeaveReq().longValue());
         assertEquals((long) 2, igmpStatisticsManager.getIgmpStats().getIgmpMsgReceived().longValue());
@@ -138,6 +137,25 @@ public class IgmpStatisticsTest extends IgmpManagerBase {
         public void event(IgmpStatisticsEvent event) {
             events.add(event);
         }
-
     }
+
+    @Test
+    public void testUnknownMulticastIpAddress() throws InterruptedException {
+        SingleStateMachine.sendQuery = false;
+
+        igmpManager.networkConfig = new TestNetworkConfigRegistry(false);
+        igmpManager.activate();
+
+        Ethernet firstPacket =
+             IgmpSender.getInstance().buildIgmpV3Join(Ip4Address.valueOf("124.0.0.0"), SOURCE_IP_OF_A);
+        // Sending first packet
+        sendPacket(firstPacket, false);
+        synchronized (savedPackets) {
+            savedPackets.wait(WAIT_TIMEOUT);
+        }
+        assertAfter(WAIT_TIMEOUT, WAIT_TIMEOUT * 2, () ->
+        assertEquals((long) 1,
+             igmpStatisticsManager.getIgmpStats().getFailJoinReqUnknownMulticastIpCounter().longValue()));
+    }
+
 }

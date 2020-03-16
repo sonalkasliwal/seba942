@@ -23,7 +23,7 @@ import org.onlab.packet.Ethernet;
 import org.onosproject.core.CoreServiceAdapter;
 import org.onosproject.net.flow.FlowRuleServiceAdapter;
 import org.onosproject.net.flowobjective.FlowObjectiveServiceAdapter;
-import org.opencord.igmpproxy.IgmpManagerBase.MockComponentContext;
+import org.opencord.igmpproxy.IgmpManagerBase.MockCfgService;
 
 import static org.junit.Assert.*;
 
@@ -54,7 +54,6 @@ public class IgmpManagerTest extends IgmpManagerBase {
         igmpStatisticsManager.cfgService = new MockCfgService();
         TestUtils.setField(igmpStatisticsManager, "eventDispatcher", new TestEventDispatcher());
         igmpStatisticsManager.activate(new MockComponentContext());
-        igmpStatisticsManager.activate();
         igmpManager.igmpStatisticsManager = this.igmpStatisticsManager;
         // By default - we send query messages
         SingleStateMachine.sendQuery = true;
