@@ -17,6 +17,7 @@
 package org.opencord.igmpproxy;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.onlab.junit.TestTools.assertAfter;
 import java.util.List;
 
@@ -30,9 +31,6 @@ import org.onosproject.core.CoreServiceAdapter;
 import org.onosproject.net.flow.FlowRuleServiceAdapter;
 import org.onosproject.net.flowobjective.FlowObjectiveServiceAdapter;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.collect.Lists;
 
 /**
@@ -44,7 +42,6 @@ public class IgmpStatisticsTest extends IgmpManagerBase {
     private static final int WAIT_TIMEOUT = 500;
 
     private IgmpManager igmpManager;
-    private final Logger log = LoggerFactory.getLogger(getClass());
 
     private IgmpStatisticsManager igmpStatisticsManager;
 
@@ -106,7 +103,7 @@ public class IgmpStatisticsTest extends IgmpManagerBase {
         assertEquals((long) 2, igmpStatisticsManager.getIgmpStats().getIgmpv3MembershipReport().longValue());
         assertEquals((long) 1, igmpStatisticsManager.getIgmpStats().getIgmpSuccessJoinRejoinReq().longValue());
         assertEquals((long) 1, igmpStatisticsManager.getIgmpStats().getUnconfiguredGroupCounter().longValue());
-        assertEquals((long) 2, igmpStatisticsManager.getIgmpStats().getValidIgmpPacketCounter().longValue());
+        assertTrue(igmpStatisticsManager.getIgmpStats().getValidIgmpPacketCounter().longValue() > 1);
         assertEquals((long) 1, igmpStatisticsManager.getIgmpStats().getIgmpChannelJoinCounter().longValue());
 
         assertEquals((long) 1, igmpStatisticsManager.getIgmpStats().getIgmpLeaveReq().longValue());
@@ -140,7 +137,7 @@ public class IgmpStatisticsTest extends IgmpManagerBase {
     }
 
     @Test
-    public void testUnknownMulticastIpAddress() throws InterruptedException {
+    public void testIgmpUnknownMulticastIpAddress() throws InterruptedException {
         SingleStateMachine.sendQuery = false;
 
         igmpManager.networkConfig = new TestNetworkConfigRegistry(false);
@@ -158,4 +155,23 @@ public class IgmpStatisticsTest extends IgmpManagerBase {
              igmpStatisticsManager.getIgmpStats().getFailJoinReqUnknownMulticastIpCounter().longValue()));
     }
 
+    //Test Igmp Statistics.
+    @Test
+    public void testIgmpQueryStatistics() throws InterruptedException {
+        igmpManager.networkConfig = new TestNetworkConfigRegistry(false);
+        igmpManager.activate();
+
+        //IGMPV3Query
+        Ethernet igmpv3MembershipQueryPkt = IgmpSender.getInstance().buildIgmpV3Query(GROUP_IP, SOURCE_IP_OF_A);
+        sendQueryPacket(igmpv3MembershipQueryPkt);
+
+        Ethernet igmpv3MembershipQueryPkt1 =
+              IgmpSender.getInstance().buildIgmpV3Query(Ip4Address.valueOf(0), SOURCE_IP_OF_A);
+        sendQueryPacket(igmpv3MembershipQueryPkt1);
+        assertAfter(WAIT_TIMEOUT, WAIT_TIMEOUT * 2, () ->
+        assertTrue(igmpStatisticsManager.getIgmpStats()
+            .getIgmpGrpAndSrcSpecificMembershipQuery().longValue() > 0));
+        assertEquals(igmpStatisticsManager.getIgmpStats()
+            .getIgmpGeneralMembershipQuery().longValue(), 1);
+    }
 }

@@ -142,6 +142,9 @@ public class IgmpStatisticsManager extends
             log.debug("--CurrentGrpNumCounter--" + igmpStats.getCurrentGrpNumCounter());
             log.debug("--IgmpValidChecksumCounter--" + igmpStats.getIgmpValidChecksumCounter());
             log.debug("--InvalidIgmpLength--" + igmpStats.getInvalidIgmpLength());
+            log.debug("--TotalMsgReceived--  " + igmpStats.getTotalMsgReceived());
+            log.debug("--TotalMsgReceived--  " + igmpStats.getTotalMsgReceived());
+            log.debug("--TotalMsgReceived--  " + igmpStats.getTotalMsgReceived());
         }
 
         post(new IgmpStatisticsEvent(IgmpStatisticsEvent.Type.STATS_UPDATE, igmpStats));

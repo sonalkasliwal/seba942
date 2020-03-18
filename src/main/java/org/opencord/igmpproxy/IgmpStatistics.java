@@ -72,6 +72,13 @@ public class IgmpStatistics {
     // Counter for Invalid Igmp Length
     private AtomicLong invalidIgmpLength = new AtomicLong();
 
+    //Total number of general IGMP membership query messages received
+    private AtomicLong igmpGeneralMembershipQuery = new AtomicLong();
+    //Total number of group specific IGMP membership query messages received
+    private AtomicLong igmpGrpSpecificMembershipQuery = new AtomicLong();
+    //Total number of group and source specific IGMP membership query messages received
+    private AtomicLong igmpGrpAndSrcSpecificMembershipQuery = new AtomicLong();
+
     public Long getIgmpJoinReq() {
         return igmpJoinReq.get();
     }
@@ -256,4 +263,27 @@ public class IgmpStatistics {
         invalidIgmpLength.incrementAndGet();
     }
 
+    public Long getIgmpGeneralMembershipQuery() {
+        return igmpGeneralMembershipQuery.get();
+    }
+
+    public Long getIgmpGrpSpecificMembershipQuery() {
+        return igmpGrpSpecificMembershipQuery.get();
+    }
+
+    public Long getIgmpGrpAndSrcSpecificMembershipQuery() {
+        return igmpGrpAndSrcSpecificMembershipQuery.get();
+    }
+
+    public void increaseIgmpGeneralMembershipQuery() {
+        igmpGeneralMembershipQuery.incrementAndGet();
+    }
+
+    public void increaseIgmpGrpSpecificMembershipQuery() {
+        igmpGrpSpecificMembershipQuery.incrementAndGet();
+    }
+
+    public void increaseIgmpGrpAndSrcSpecificMembershipQuery() {
+        igmpGrpAndSrcSpecificMembershipQuery.incrementAndGet();
+    }
 }
